@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Anatomía Patológica — Preguntas 42-60</title>
+  <style>
+    :root {
+      --blue: #1664d9;
+      --blue-dark: #0f4fb1;
+      --bg: #ffffff;
+      --card: #f3f6fb;
+      --text: #1d1d1f;
+      --muted: #6b7280;
+      --ok: #15803d;
+      --bad: #b91c1c;
+      --ok-bg: #dcfce7;
+      --bad-bg: #fee2e2;
+      --border: #d9e1ee;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #eef2f7;
+      z-index: 10;
+      padding: 12px 18px 10px;
+    }
+
+    .progress-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .brand {
+      font-weight: 800;
+      margin-right: 18px;
+      font-size: 19px;
+      white-space: nowrap;
+    }
+
+    .segments {
+      display: flex;
+      gap: 7px;
+      flex: 1;
+    }
+
+    .segment {
+      height: 5px;
+      flex: 1;
+      border-radius: 999px;
+      background: #dce4f0;
+      overflow: hidden;
+    }
+
+    .segment.done {
+      background: var(--blue);
+    }
+
+    .score {
+      margin-left: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 95px;
+      text-align: right;
+    }
+
+    main {
+      width: min(960px, 92vw);
+      margin: 64px auto 110px;
+    }
+
+    .quiz-card {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .question-meta {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      font-size: 18px;
+      line-height: 1.35;
+      margin-bottom: 44px;
+    }
+
+    .q-number {
+      width: 44px;
+      text-align: right;
+      font-weight: 800;
+    }
+
+    .q-text {
+      flex: 1;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      padding: 19px 20px;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 19px;
+      line-height: 1.35;
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    .option:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: #c8d6ee;
+    }
+
+    .option:disabled {
+      cursor: default;
+    }
+
+    .letter {
+      font-weight: 800;
+      color: #4b5563;
+      text-transform: uppercase;
+    }
+
+    .option.correct {
+      background: var(--ok-bg);
+      border-color: #86efac;
+    }
+
+    .option.incorrect {
+      background: var(--bad-bg);
+      border-color: #fca5a5;
+    }
+
+    .option.reveal {
+      border-color: #86efac;
+    }
+
+    .hint {
+      border: 0;
+      background: transparent;
+      font-weight: 700;
+      font-size: 16px;
+      color: #222;
+      cursor: pointer;
+      padding: 8px 0;
+      margin-top: 4px;
+    }
+
+    .hint-box, .feedback {
+      display: none;
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      line-height: 1.45;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .hint-box.show, .feedback.show {
+      display: block;
+    }
+
+    .feedback.ok {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .feedback.bad {
+      border-color: #fca5a5;
+      background: #fff7f7;
+    }
+
+    .feedback-title {
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .bottom {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 18px 24px;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #eef2f7;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .primary, .secondary {
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 34px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: white;
+      min-width: 170px;
+    }
+
+    .primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .primary:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .secondary {
+      background: #eef2f7;
+      color: #111827;
+    }
+
+    .result {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result h1 {
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .result p {
+      font-size: 20px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .review {
+      margin-top: 28px;
+      text-align: left;
+      display: grid;
+      gap: 12px;
+    }
+
+    .review-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        margin-top: 34px;
+      }
+
+      .brand {
+        display: none;
+      }
+
+      .score {
+        min-width: 70px;
+        font-size: 14px;
+      }
+
+      .question-meta {
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+
+      .q-number {
+        width: 32px;
+      }
+
+      .q-text {
+        font-size: 19px;
+      }
+
+      .option {
+        grid-template-columns: 32px 1fr;
+        font-size: 16px;
+        padding: 16px;
+      }
+
+      .bottom {
+        padding: 12px;
+      }
+
+      .primary, .secondary {
+        padding: 13px 24px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="progress-row">
+      <div class="brand">Quiz AP</div>
+      <div class="segments" id="segments"></div>
+      <div class="score" id="score">1 / 19 · 0 ✓</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="quiz-card" id="quizCard">
+      <div class="question-meta">
+        <div class="q-number" id="questionNumber"></div>
+        <div class="q-text" id="questionText"></div>
+      </div>
+
+      <div class="options" id="options"></div>
+
+      <button class="hint" id="hintButton">Mostrar dica⌄</button>
+      <div class="hint-box" id="hintBox"></div>
+
+      <div class="feedback" id="feedback"></div>
+    </section>
+
+    <section class="result" id="result">
+      <h1>Quiz terminado</h1>
+      <p id="resultText"></p>
+      <div class="review" id="review"></div>
+    </section>
+  </main>
+
+  <footer class="bottom">
+    <button class="secondary" id="restartButton">Reiniciar</button>
+    <button class="primary" id="nextButton" disabled>Avançar</button>
+  </footer>
+
+  <script>
+    const questions = [{"num": 42, "enunciado": "¿Qué es FALSO en relación al leiomioma?", "opciones": ["a) Son tumores frecuentes del útero.", "b) Son tumores miogénicos con diferenciación muscular lisa.", "c) A nivel intrauterino pueden ser submucosos, intramurales y subserosos.", "d) Las células tumorales presentan expresión de actina y desmina.", "e) Son tumores mesenquimales malignos."], "correcta": "e", "justificacion": "La opción correcta es la e) porque el leiomioma es un tumor benigno de músculo liso. No es un tumor mesenquimal maligno. Las opciones a), b), c) y d) describen características verdaderas: son frecuentes en el útero, tienen diferenciación muscular lisa, pueden ser submucosos, intramurales o subserosos, y expresan marcadores como actina y desmina.", "dica": "Piensa si el sufijo -oma, en este contexto, corresponde a lesión benigna o maligna."}, {"num": 43, "enunciado": "Del carcinoma pancreático NO es CIERTO que:", "opciones": ["a) El tumor maligno más frecuente es el adenocarcinoma ductal.", "b) La localización más frecuente es el cuerpo pancreático y da clínica de obstrucción biliar.", "c) Puede haber pancreatitis coexistente.", "d) Microscópicamente son tumores mal delimitados y difíciles de medir.", "e) Microscópicamente aparecen glándulas tubulares rodeadas de estroma desmoplásico."], "correcta": "b", "justificacion": "La opción correcta es la b) porque la localización más frecuente del adenocarcinoma pancreático es la cabeza del páncreas, no el cuerpo. La obstrucción biliar e ictericia son típicas de los tumores de cabeza pancreática. Las demás opciones son verdaderas: el adenocarcinoma ductal es el tumor maligno pancreático más frecuente, puede coexistir pancreatitis, suele ser mal delimitado y muestra glándulas infiltrantes con estroma desmoplásico.", "dica": "Relaciona obstrucción biliar con la zona anatómica que está más cerca del colédoco."}, {"num": 44, "enunciado": "La presencia de membranas hialinas es un hallazgo frecuente en:", "opciones": ["a) Neumonía lobar.", "b) Bronconeumonía por Klebsiella.", "c) Lesión alveolar difusa del shock.", "d) Todas son ciertas.", "e) Ninguna."], "correcta": "c", "justificacion": "La opción correcta es la c) porque las membranas hialinas son características de la lesión alveolar difusa, típica del daño alveolar agudo y del shock. En la neumonía lobar y en la bronconeumonía predominan exudados inflamatorios intraalveolares, no membranas hialinas como hallazgo típico. Por eso no son correctas d) ni e).", "dica": "Las membranas hialinas aparecen en daño alveolar difuso y distrés respiratorio agudo."}, {"num": 45, "enunciado": "La lesión con mayor tendencia a la malignización en el endometrio es:", "opciones": ["a) Hiperplasia simple endometrial.", "b) Leiomioma.", "c) Hiperplasia endometrial quística.", "d) Hiperplasia adenomatosa atípica.", "e) Irregular maduración endometrial."], "correcta": "d", "justificacion": "La opción correcta es la d) porque la hiperplasia adenomatosa atípica, equivalente a hiperplasia endometrial con atipia, es la lesión con mayor riesgo de progresión a adenocarcinoma endometrial. La hiperplasia simple y la quística tienen menor riesgo si no hay atipia. El leiomioma es una lesión benigna del miometrio y la irregular maduración endometrial no es la lesión de mayor potencial maligno.", "dica": "La palabra clave es atipia."}, {"num": 46, "enunciado": "Una de las siguientes características NO es propia del carcinoma papilar de tiroides:", "opciones": ["a) Puede debutar como una metástasis ganglionar cervical.", "b) Presenta inclusiones intranucleares/núcleos en cristal esmerilado u ojos de la huerfanita Annie.", "c) A menudo tiene surcos o invaginaciones intranucleares.", "d) A menudo presenta cuerpos de Psamoma.", "e) Presenta inclusiones intracitoplasmáticas/cuerpos de Lewy."], "correcta": "e", "justificacion": "La opción correcta es la e) porque los cuerpos de Lewy pertenecen a patología neurodegenerativa y no son característicos del carcinoma papilar de tiroides. Las opciones a), b), c) y d) sí son rasgos clásicos: metástasis ganglionar cervical, núcleos en cristal esmerilado u ojos de la huerfanita Annie, surcos nucleares y cuerpos de Psamoma.", "dica": "Busca la opción que pertenece a neurología, no a tiroides."}, {"num": 47, "enunciado": "El estudio citológico del esputo muestra espirales de Curschmann y cristales de Charcot-Leyden. El paciente tendrá con mayor posibilidad:", "opciones": ["a) Bronquitis crónica.", "b) Enfisema pulmonar.", "c) Asma bronquial.", "d) Asbestosis.", "e) Silicosis."], "correcta": "c", "justificacion": "La opción correcta es la c) porque las espirales de Curschmann y los cristales de Charcot-Leyden son hallazgos clásicos del asma bronquial. Bronquitis crónica y enfisema pertenecen al espectro EPOC y no tienen estos hallazgos como dato típico. Asbestosis y silicosis son neumoconiosis por inhalación de fibras o partículas minerales.", "dica": "Charcot-Leyden se relaciona con eosinófilos."}, {"num": 48, "enunciado": "¿Cuál de las siguientes patologías NO está, por lo general, asociada a la inhalación de amianto?", "opciones": ["a) Carcinomas broncopulmonares.", "b) Nódulos silicóticos.", "c) Mesotelioma pleural.", "d) Placas hialinas pleurales.", "e) Mesotelioma peritoneal."], "correcta": "b", "justificacion": "La opción correcta es la b) porque los nódulos silicóticos son propios de la silicosis, causada por inhalación de sílice, no por amianto. El amianto se asocia a carcinomas broncopulmonares, mesotelioma pleural, placas hialinas pleurales y mesotelioma peritoneal.", "dica": "Silicótico viene de sílice, no de asbesto."}, {"num": 49, "enunciado": "En los carcinomas de cabeza de páncreas, es FALSO:", "opciones": ["a) Obstrucción biliar e ictericia.", "b) No afecta a la vía biliar.", "c) Crecimiento local con diseminación.", "d) Infiltración retroperitoneal y perineural.", "e) Metástasis hepática, pulmonar y ósea."], "correcta": "b", "justificacion": "La opción correcta es la b) porque los carcinomas de cabeza de páncreas sí pueden afectar a la vía biliar, produciendo obstrucción biliar e ictericia. Las demás opciones son compatibles con este tumor: crecimiento local, diseminación, infiltración retroperitoneal y perineural, y metástasis a distancia.", "dica": "Cabeza del páncreas = cerca de la vía biliar."}, {"num": 50, "enunciado": "¿Cuál de estos factores NO es de riesgo para el adenocarcinoma endometrial?", "opciones": ["a) Obesidad.", "b) Diabetes.", "c) Hiperplasia endometrial.", "d) Multiparidad.", "e) Hiperestrogenia."], "correcta": "d", "justificacion": "La opción correcta es la d) porque la multiparidad no es un factor de riesgo típico; al contrario, la nuliparidad se asocia más a riesgo por mayor exposición estrogénica no contrarrestada. Obesidad, diabetes, hiperplasia endometrial e hiperestrogenia sí son factores relacionados con adenocarcinoma endometrial.", "dica": "El riesgo aumenta con exposición prolongada a estrógenos."}, {"num": 51, "enunciado": "Entre los factores de riesgo relacionados con el cáncer de mama NO se encuentra:", "opciones": ["a) Exposición prolongada a estrógenos.", "b) Lactancia.", "c) Obesidad.", "d) Antecedentes familiares de cáncer de mama.", "e) Tratamiento hormonal sustitutivo."], "correcta": "b", "justificacion": "La opción correcta es la b) porque la lactancia no se considera un factor de riesgo clásico de cáncer de mama; suele tener efecto protector. Exposición prolongada a estrógenos, obesidad, antecedentes familiares y tratamiento hormonal sustitutivo sí se relacionan con mayor riesgo.", "dica": "Busca la opción que suele considerarse protectora."}, {"num": 52, "enunciado": "¿Cuál de los siguientes factores se ha relacionado con un peor pronóstico en cáncer de mama?", "opciones": ["a) Sobreexpresión de Her2/Neu.", "b) Positividad para receptores de estrógenos.", "c) Positividad para receptores de progesterona.", "d) Índice de proliferación Ki67 menor del 10%.", "e) Ganglio centinela negativo."], "correcta": "a", "justificacion": "La opción correcta es la a) porque la sobreexpresión de Her2/Neu se ha asociado clásicamente a mayor agresividad biológica y peor pronóstico, aunque actualmente tiene tratamiento dirigido. La positividad para receptores hormonales suele asociarse a mejor respuesta terapéutica. Un Ki67 bajo indica baja proliferación y el ganglio centinela negativo implica ausencia de metástasis ganglionar detectable.", "dica": "Piensa en marcadores de agresividad tumoral."}, {"num": 53, "enunciado": "¿Qué tipo de carcinoma de pulmón se caracteriza por presentar patrón de crecimiento lepídico?", "opciones": ["a) Carcinoma de células escamosas de pulmón.", "b) Carcinoide atípico.", "c) Carcinoma bronquioalveolar.", "d) Carcinoma de células pequeñas de pulmón.", "e) Carcinoma de células grandes de pulmón."], "correcta": "c", "justificacion": "La opción correcta es la c) porque el carcinoma bronquioalveolar, término clásico actualmente integrado dentro del espectro de adenocarcinoma pulmonar con crecimiento lepídico, crece tapizando paredes alveolares. Las demás opciones no se caracterizan por ese patrón: el escamoso muestra diferenciación escamosa, el carcinoide es neuroendocrino, el de células pequeñas es de alto grado neuroendocrino y el de células grandes es poco diferenciado.", "dica": "Lepídico significa crecimiento sobre las paredes alveolares."}, {"num": 54, "enunciado": "Señala la afirmación FALSA respecto al tumor maligno de la vaina del nervio periférico:", "opciones": ["a) Clásicamente recibe el nombre de schwannoma maligno.", "b) Se trata de un fibrosarcoma de crecimiento fasciculado compacto.", "c) Puede presentar diferenciación rabdomioblástica, cartílago e incluso hueso.", "d) Es un sarcoma de bajo grado que no suele presentar mitosis, necrosis ni pleomorfismo nuclear severo.", "e) Puede presentar patrones histológicos mixtos divergentes."], "correcta": "d", "justificacion": "La opción correcta es la d) porque el tumor maligno de la vaina del nervio periférico es un sarcoma agresivo que puede mostrar mitosis, necrosis y pleomorfismo nuclear. No se define como un sarcoma de bajo grado sin atipia severa. Las demás opciones son compatibles: se denominó clásicamente schwannoma maligno, puede crecer en fascículos y puede mostrar diferenciación heteróloga o patrones divergentes.", "dica": "La clave está en que es maligno y suele ser agresivo."}, {"num": 55, "enunciado": "¿Cuál de las siguientes lesiones proliferativas del sistema nervioso periférico NO se considera neoplásica?", "opciones": ["a) Schwannoma.", "b) Neurofibroma.", "c) Neuroma.", "d) Neurotequeoma.", "e) Todos son procesos neoplásicos."], "correcta": "c", "justificacion": "La opción correcta es la c) porque el neuroma, especialmente el neuroma traumático, es una proliferación reactiva desorganizada tras lesión nerviosa y no una verdadera neoplasia. Schwannoma, neurofibroma y neurotequeoma sí se consideran lesiones neoplásicas. Por tanto, no es correcta la opción e).", "dica": "Piensa en una lesión reactiva tras daño nervioso."}, {"num": 56, "enunciado": "La asbestosis se caracteriza por todo lo siguiente EXCEPTO:", "opciones": ["a) Ser una neumopatía con muy escasa fibrosis intersticial.", "b) Asociarse con el desarrollo de mesoteliomas.", "c) Asociarse con el desarrollo de carcinomas de pulmón.", "d) Manifestarse en ocasiones como derrame pleural benigno.", "e) Tener relación directa con la intensidad y duración de la exposición al asbesto."], "correcta": "a", "justificacion": "La opción correcta es la a) porque la asbestosis es una neumopatía intersticial fibrosante; no se caracteriza por muy escasa fibrosis intersticial. Las opciones b), c), d) y e) son verdaderas: el amianto se asocia a mesotelioma, carcinoma pulmonar, derrame pleural benigno y su riesgo depende de intensidad y duración de exposición.", "dica": "Asbestosis es una enfermedad pulmonar intersticial fibrosante."}, {"num": 57, "enunciado": "¿Cuál es el tumor germinal más frecuente?", "opciones": ["a) Carcinoma embrionario.", "b) Coriocarcinoma.", "c) Tumor de saco vitelino.", "d) Seminoma.", "e) Ninguna de las anteriores."], "correcta": "d", "justificacion": "La opción correcta es la d) porque el seminoma es el tumor germinal testicular más frecuente en el adulto. Carcinoma embrionario, coriocarcinoma y tumor de saco vitelino son tumores germinales, pero no son el más frecuente en este contexto general.", "dica": "El tumor germinal testicular clásico más frecuente en adultos es radiosensible y de células claras."}, {"num": 58, "enunciado": "Los cuerpos de Schiller-Duval en un tumor testicular son característicos de cuál de los siguientes tumores:", "opciones": ["a) Seminoma.", "b) Carcinoma embrionario.", "c) Coriocarcinoma.", "d) Tumor de células de Leydig.", "e) Ninguno de los anteriores."], "correcta": "e", "justificacion": "La opción correcta es la e) porque los cuerpos de Schiller-Duval son característicos del tumor del saco vitelino, que no aparece entre las opciones. Seminoma, carcinoma embrionario, coriocarcinoma y tumor de células de Leydig no son los tumores característicamente asociados a estos cuerpos.", "dica": "Schiller-Duval apunta a tumor del saco vitelino."}, {"num": 59, "enunciado": "¿Cuál es el tipo de cáncer más frecuente en niños?", "opciones": ["a) Leucemia.", "b) Rabdomiosarcoma.", "c) Sarcoma de Ewing.", "d) Adenocarcinoma.", "e) Cáncer renal."], "correcta": "a", "justificacion": "La opción correcta es la a) porque las leucemias, especialmente la leucemia linfoblástica aguda, son el cáncer más frecuente en la infancia. Rabdomiosarcoma, sarcoma de Ewing y cáncer renal pediátrico son relevantes, pero menos frecuentes globalmente. El adenocarcinoma no es el cáncer infantil más común.", "dica": "En pediatría, piensa primero en neoplasias hematológicas."}, {"num": 60, "enunciado": "¿Cuál de los siguientes cánceres NO está asociado a procesos infecciosos?", "opciones": ["a) Hepatocarcinoma.", "b) Adenocarcinoma gástrico.", "c) Carcinoma nasofaríngeo.", "d) Carcinoma de cérvix.", "e) Sarcoma de Ewing."], "correcta": "e", "justificacion": "La opción correcta es la e) porque el sarcoma de Ewing no se asocia típicamente a procesos infecciosos, sino a alteraciones genéticas características. Hepatocarcinoma se asocia a hepatitis B y C, adenocarcinoma gástrico a Helicobacter pylori, carcinoma nasofaríngeo a virus de Epstein-Barr y carcinoma de cérvix a VPH.", "dica": "Busca el tumor que se explica mejor por translocación genética que por infección."}];
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+    const answers = [];
+
+    const segmentsEl = document.getElementById("segments");
+    const scoreEl = document.getElementById("score");
+    const questionNumberEl = document.getElementById("questionNumber");
+    const questionTextEl = document.getElementById("questionText");
+    const optionsEl = document.getElementById("options");
+    const hintButton = document.getElementById("hintButton");
+    const hintBox = document.getElementById("hintBox");
+    const feedbackEl = document.getElementById("feedback");
+    const nextButton = document.getElementById("nextButton");
+    const restartButton = document.getElementById("restartButton");
+    const quizCard = document.getElementById("quizCard");
+    const result = document.getElementById("result");
+    const resultText = document.getElementById("resultText");
+    const review = document.getElementById("review");
+
+    function initSegments() {
+      segmentsEl.innerHTML = "";
+      questions.forEach((_, i) => {
+        const s = document.createElement("div");
+        s.className = "segment";
+        if (i < current) s.classList.add("done");
+        segmentsEl.appendChild(s);
+      });
+    }
+
+    function updateScore() {
+      scoreEl.textContent = `${current + 1} / ${questions.length} · ${score} ✓`;
+    }
+
+    function renderQuestion() {
+      answered = false;
+      const q = questions[current];
+
+      quizCard.classList.remove("hidden");
+      result.classList.remove("show");
+      questionNumberEl.textContent = `${current + 1}.`;
+      questionTextEl.textContent = q.enunciado;
+      optionsEl.innerHTML = "";
+      feedbackEl.className = "feedback";
+      feedbackEl.innerHTML = "";
+      hintBox.className = "hint-box";
+      hintBox.textContent = q.dica;
+      hintButton.textContent = "Mostrar dica⌄";
+      nextButton.disabled = true;
+      nextButton.textContent = current === questions.length - 1 ? "Finalizar" : "Avançar";
+
+      q.opciones.forEach((optionText) => {
+        const letter = optionText.slice(0, 1).toLowerCase();
+        const cleanText = optionText.slice(3);
+        const button = document.createElement("button");
+        button.className = "option";
+        button.dataset.letter = letter;
+        button.innerHTML = `<span class="letter">${letter.toUpperCase()}.</span><span>${escapeHtml(cleanText)}</span>`;
+        button.addEventListener("click", () => selectAnswer(letter));
+        optionsEl.appendChild(button);
+      });
+
+      initSegments();
+      updateScore();
+    }
+
+    function selectAnswer(letter) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[current];
+      const isCorrect = letter === q.correcta;
+      if (isCorrect) score++;
+
+      answers[current] = {
+        question: q.num,
+        selected: letter,
+        correct: q.correcta,
+        isCorrect
+      };
+
+      document.querySelectorAll(".option").forEach((btn) => {
+        btn.disabled = true;
+        if (btn.dataset.letter === q.correcta) btn.classList.add("correct");
+        if (btn.dataset.letter === letter && !isCorrect) btn.classList.add("incorrect");
+      });
+
+      feedbackEl.className = `feedback show ${isCorrect ? "ok" : "bad"}`;
+      feedbackEl.innerHTML = `
+        <div class="feedback-title">${isCorrect ? "Correcto ✅" : "Incorrecto ❌"}</div>
+        <div><strong>Respuesta correcta:</strong> ${q.correcta})</div>
+        <p>${escapeHtml(q.justificacion)}</p>
+      `;
+
+      nextButton.disabled = false;
+      updateScore();
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+      if (current < questions.length - 1) {
+        current++;
+        renderQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      quizCard.classList.add("hidden");
+      result.classList.add("show");
+      nextButton.disabled = true;
+      nextButton.textContent = "Terminado";
+
+      const percent = Math.round((score / questions.length) * 100);
+      resultText.textContent = `Has acertado ${score} de ${questions.length} preguntas (${percent}%).`;
+
+      review.innerHTML = "";
+      questions.forEach((q, i) => {
+        const ans = answers[i];
+        const item = document.createElement("div");
+        item.className = "review-item";
+        item.innerHTML = `
+          <strong>Pregunta ${q.num}</strong><br>
+          Tu respuesta: <strong>${ans ? ans.selected : "-"})</strong> · Correcta: <strong>${q.correcta})</strong>
+          ${ans && ans.isCorrect ? "✅" : "❌"}
+        `;
+        review.appendChild(item);
+      });
+
+      document.querySelectorAll(".segment").forEach(s => s.classList.add("done"));
+      scoreEl.textContent = `${questions.length} / ${questions.length} · ${score} ✓`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function restart() {
+      current = 0;
+      score = 0;
+      answered = false;
+      answers.length = 0;
+      renderQuestion();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    hintButton.addEventListener("click", () => {
+      const open = hintBox.classList.toggle("show");
+      hintButton.textContent = open ? "Ocultar dica⌃" : "Mostrar dica⌄";
+    });
+
+    nextButton.addEventListener("click", nextQuestion);
+    restartButton.addEventListener("click", restart);
+
+    renderQuestion();
+  </script>
+</body>
+</html>
